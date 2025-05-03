@@ -134,12 +134,10 @@ IF EXIST "!SCRIPTLOCATION!!Powershell_Script_Name!" (
 	echo.
 	echo --------------------------------------------------------------------------------------------------------------------------
 	echo.
-	echo Powershell Version
-	powershell -Command "$PSVersionTable.PSVersion"
-	
+	echo Powershell Version: && powershell -Command "Write-Host $PSVersionTable.PSVersion.ToString()"
+	echo.
 	FOR /F "tokens=*" %%G IN ('powershell -command "Invoke-Command -ScriptBlock { ( Powershell Get-ExecutionPolicy ).Trim() }"') DO (set "Get-Execution-Policy-Status=%%G")
 	echo Powershell Execution Status: !Get-Execution-Policy-Status!
-	echo.
 	REM -------------------------------------------------------
 	REM	Powershell commands for making changes
 	REM

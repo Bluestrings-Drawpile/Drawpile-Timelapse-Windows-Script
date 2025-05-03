@@ -3,8 +3,10 @@
 # if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) { Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs; exit }
 $Script_Version=1.0
 
+$MyPowershellVersionVariable = $PSVersionTable.PSVersion.ToString()
 Write-Host ""
-Write-Host "Powershell Script Version: 1.0"
+Write-Host "Powershell Version:                     $MyPowershellVersionVariable "
+Write-Host "Drawpile-Timelapse.ps1 Script Version:  1.1"
 
 function PauseScript {
     Read-Host -Prompt "Press any key to continue..."
