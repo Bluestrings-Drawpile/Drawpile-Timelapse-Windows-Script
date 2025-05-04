@@ -6,7 +6,7 @@ $Script_Version=1.0
 $MyPowershellVersionVariable = $PSVersionTable.PSVersion.ToString()
 Write-Host ""
 Write-Host "Powershell Version:                     $MyPowershellVersionVariable "
-Write-Host "Drawpile-Timelapse.ps1 Script Version:  1.1"
+Write-Host "Drawpile-Timelapse.ps1 Script Version:  1.2"
 
 function PauseScript {
     Read-Host -Prompt "Press any key to continue..."
@@ -182,6 +182,10 @@ Write-Host ""
 Write-Host "-------------------------------------------------------------------------"
 Write-Host "-------------------------------------------------------------------------"
 Write-Host ""
+Write-Host "Please select a completed DPREC recording made in Drawpile."
+Write-Host "To make one, before drawing, select 'File', 'Record'."
+Write-Host "Finish your drawing, then 'File', 'Stop Recording'."
+Write-Host ""
 $DPREC_FileName_Selected=Get-DPREC-FileName -initialDirectory “c:fso”
 
 if ($DPREC_FileName_Selected -eq $null -or $DPREC_FileName_Selected -eq "") {
@@ -199,7 +203,8 @@ if ($DPREC_FileName_Selected -eq $null -or $DPREC_FileName_Selected -eq "") {
 Write-Host ""
 Write-Host "-------------------------------------------------------------------------"
 Write-Host ""
-
+Write-Host "Choose a location and write the filename to output a video."
+Write-Host ""
 $Video_FileName_Selected=Set-Output-FileName -initialDirectory “c:fso”
 
 if ($Video_FileName_Selected -eq $null -or $Video_FileName_Selected -eq "") {
@@ -264,6 +269,80 @@ Write-Host ""
 Write-Host "-------------------------------------------------------------------------"
 Write-Host "-------------------------------------------------------------------------"
 Write-Host ""
+function No_Crop_Resolution_Input_Function {
+	Write-Host ""
+	Write-Host "-------------------------------------------------------------------------"
+	Write-Host "-------------------------------------------------------------------------"
+	Write-Host ""
+	Write-Host "Alright, skipping crop. To automatically provide a suggested video"
+	Write-Host "resize for the canvas, can you provide the full dimensions of the"
+	Write-Host "canvas instead? (RECOMMENDED)"
+	Write-Host ""
+	Write-Host "Note: You will need to open the DPREC file and grab the canvas" -ForegroundColor Black -BackgroundColor Yellow
+	Write-Host "      by going to Edit, Resize Canvas after playing the DPREC" -ForegroundColor Black -BackgroundColor Yellow
+	Write-Host "      to the end of the recording (since canvas size may change" -ForegroundColor Black -BackgroundColor Yellow
+	Write-Host "      during playback)." -ForegroundColor Black -BackgroundColor Yellow
+	Write-Host ""
+	Write-Host "Valid Answers: y, Y, yes, YES, n, N, no, NO"
+	$script:Drawpile_No_Crop_Size_Query= Read-Host -Prompt 'Can you provide the canvas dimensions? Blank entry will skip this step.'
+
+	If (($script:Drawpile_No_Crop_Size_Query -eq "Y") -or ($script:Drawpile_No_Crop_Size_Query -eq "yes")) {
+		[int]$script:number_1 = 0
+		[int]$script:number_2 = 0
+		
+		Write-Host ""
+		Write-Host "-------------------------------------------------------------------------"
+		Write-Host ""
+		$script:number_3 = -1
+		Write-Host "Edit, Resize canvas. Drawpile displays coordinates in this menu with "
+		Write-Host "the format [ X ] x [ Y ]. Provide value X."
+		while ($script:number_3 -lt 1 -or $script:number_3 -gt 50000) {
+			[int]$script:number_3 = Read-Host "Enter a number."
+			[int]$script:number_3_offset=$number_3
+			If ($script:number_3 -match "\D") {
+				Write-Host "Invalid input. Please enter a number."
+				$script:number_3 = -1
+			} elseif ($script:number_3 -lt 1 -or $script:number_3 -gt 50000) {
+				Write-Host "Number is out of range. Please enter a number between 1 and 50000."
+				Write-Host ""
+			} elseif ($script:number_3_offset -le 0) {
+				Write-Host "The number is zero or negative. Please try again."
+				$script:number_3 = -1
+			} else {
+				# Correct value entered.
+			}
+		}
+		Write-Host ""
+		Write-Host "-------------------------------------------------------------------------"
+		Write-Host ""
+		$script:number_4 = -1
+		Write-Host "Edit, Resize canvas. Drawpile displays coordinates in this menu with "
+		Write-Host "the format [ X ] x [ Y ]. Provide value Y."
+		while ($script:number_4 -lt 1 -or $script:number_4 -gt 50000) {
+			[int]$script:number_4 = Read-Host "Enter a number."
+			[int]$script:number_4_offset = $script:number_4
+			If ($script:number_4 -match "\D") {
+				Write-Host "Invalid input. Please enter a number."
+				$script:number_4 = -1
+			} elseif ($script:number_4 -lt 1 -or $script:number_4 -gt 50000) {
+				Write-Host "Number is out of range. Please enter a number between 1 and 50000."
+				Write-Host ""
+			} elseif ($script:number_4_offset -le 0) {
+				Write-Host "The number is zero or negative. Please try again."
+				$script:number_4 = -1
+			} else {
+				# Correct value entered.
+			}
+		}
+	} ElseIf (($Drawpile_No_Crop_Size_Query -eq "n") -or ($Drawpile_No_Crop_Size_Query -eq "no") -or ([string]::IsNullOrEmpty($Drawpile_No_Crop_Size_Query))) {
+		write-host ""
+		write-host "Skipping canvas size entry for automated video size suggestion..."
+	} Else {
+		write-host ""
+		write-host "Invalid Value selected. Skipping canvas size entry for automated video size suggestion..."
+	}
+}
+
 #
 #     -x, --crop <crop>
 #      Area(s) to crop. Must provide a string of the form
@@ -275,8 +354,8 @@ Write-Host "This step is to set a crop area. Output video should not be greater 
 Write-Host " 1920 in either direction, so some image compression may be necessary in "
 Write-Host " order to play on more devices. Bear this in mind when setting a crop area"
 Write-Host " for very large timelapse images."
-Write-Host ""
-Write-Host "Note: Script cannot provide a video size suggestion if you choose to skip this step." -ForegroundColor Black -BackgroundColor Yellow
+# Write-Host ""
+# Write-Host "Note: Script cannot provide a video size suggestion if you choose to skip this step." -ForegroundColor Black -BackgroundColor Yellow
 Write-Host ""
 Write-Host "Valid Answers: y, Y, yes, YES, n, N, no, NO"
 $Drawpile_Crop_Output_Query= Read-Host -Prompt 'Would you like to crop the canvas? Blank entry will skip this step.'
@@ -383,17 +462,20 @@ If (($Drawpile_Crop_Output_Query -eq "Y") -or ($Drawpile_Crop_Output_Query -eq "
 } ElseIf (($Drawpile_Crop_Output_Query -eq "n") -or ($Drawpile_Crop_Output_Query -eq "no") -or ([string]::IsNullOrEmpty($Drawpile_Crop_Output_Query))) {
 	write-host ""
     write-host "Skipping cropping of canvas ..."
+	No_Crop_Resolution_Input_Function
 } Else {
 	write-host ""
     write-host "Invalid Value selected. Skipping cropping of canvas ..."
+	No_Crop_Resolution_Input_Function
 }
 
 Write-Host ""
 Write-Host "-------------------------------------------------------------------------"
 Write-Host "-------------------------------------------------------------------------"
 Write-Host ""
+
 [int]$Suggested_Video_Maximum_Size=1920
-If (($Drawpile_Crop_Output_Query -eq "Y") -or ($Drawpile_Crop_Output_Query -eq "yes")) {
+If (($Drawpile_Crop_Output_Query -ieq "Y") -or ($Drawpile_Crop_Output_Query -ieq "yes") -or ($Drawpile_No_Crop_Size_Query -ieq "Y") -or ($Drawpile_No_Crop_Size_Query -ieq "yes")) {
     # --------------------------------------------------------------------------------------------------------
     function Odd_or_Even_3_Suggestion_Function {
         if ($script:suggested_3_size -eq $null -or $script:suggested_3_size -eq "") {
@@ -426,9 +508,9 @@ If (($Drawpile_Crop_Output_Query -eq "Y") -or ($Drawpile_Crop_Output_Query -eq "
     # --------------------------------------------------------------------------------------------------------
     If ($number_3_offset -eq $number_4_offset) {
         If ($number_3_offset -gt $Suggested_Video_Maximum_Size) {
-            Write-Host "Video is square, suggested reducing resolution for wider device compatibility to: $Suggested_Video_Maximum_Size by $Suggested_Video_Maximum_Size"
+            Write-Host "Video is square, suggested reducing resolution for wider device compatibility to: $Suggested_Video_Maximum_Size by $Suggested_Video_Maximum_Size" -ForegroundColor Black -BackgroundColor Green
         } ElseIf ($number_3_offset -eq $Suggested_Video_Maximum_Size) {
-            Write-Host "Video is square, suggested resolution: $Suggested_Video_Maximum_Size by $Suggested_Video_Maximum_Size"
+            Write-Host "Video is square, suggested resolution: $Suggested_Video_Maximum_Size by $Suggested_Video_Maximum_Size" -ForegroundColor Black -BackgroundColor Green
         } ElseIf ($number_3_offset -lt $Suggested_Video_Maximum_Size) {
             $script:suggested_3_size=[int]$number_3_offset
             Odd_or_Even_3_Suggestion_Function
@@ -489,7 +571,7 @@ If (($Drawpile_Crop_Output_Query -eq "Y") -or ($Drawpile_Crop_Output_Query -eq "
         Write-Host "Suggestion failed: This message shouldn't be visible for video resolution suggestion." -BackgroundColor Red
     }
 } Else {
-    Write-Host "Crop not provided, cannot provide video resolution suggestion. Skipping." -ForegroundColor Black -BackgroundColor Yellow
+    Write-Host "Crop or full size not provided, cannot provide video resolution suggestion. Skipping." -ForegroundColor Black -BackgroundColor Yellow
     Write-Host ""
     Write-Host "The value that should be provided depends on the size of the canvas at "
     Write-Host "the end of the recording. Open the DPREC and go to the end of the recording."
