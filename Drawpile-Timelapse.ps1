@@ -1,7 +1,9 @@
 ﻿$host.ui.RawUI.WindowTitle = "Make Drawpile-Timelapse from DPREC Recording"
 # Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
 # if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) { Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs; exit }
-$Script_Version=1.0
+$Script_Version=1.1
+
+[int]$Suggested_Video_Maximum_Size=1920
 
 $MyPowershellVersionVariable = $PSVersionTable.PSVersion.ToString()
 Write-Host ""
@@ -296,14 +298,14 @@ function No_Crop_Resolution_Input_Function {
 		$script:number_3 = -1
 		Write-Host "Edit, Resize canvas. Drawpile displays coordinates in this menu with "
 		Write-Host "the format [ X ] x [ Y ]. Provide value X."
-		while ($script:number_3 -lt 1 -or $script:number_3 -gt 50000) {
+		while ($script:number_3 -lt 1 -or $script:number_3 -gt 1000000) {
 			[int]$script:number_3 = Read-Host "Enter a number."
 			[int]$script:number_3_offset=$number_3
 			If ($script:number_3 -match "\D") {
 				Write-Host "Invalid input. Please enter a number."
 				$script:number_3 = -1
-			} elseif ($script:number_3 -lt 1 -or $script:number_3 -gt 50000) {
-				Write-Host "Number is out of range. Please enter a number between 1 and 50000."
+			} elseif ($script:number_3 -lt 1 -or $script:number_3 -gt 1000000) {
+				Write-Host "Number is out of range. Please enter a number between 1 and 1,000,000."
 				Write-Host ""
 			} elseif ($script:number_3_offset -le 0) {
 				Write-Host "The number is zero or negative. Please try again."
@@ -318,14 +320,14 @@ function No_Crop_Resolution_Input_Function {
 		$script:number_4 = -1
 		Write-Host "Edit, Resize canvas. Drawpile displays coordinates in this menu with "
 		Write-Host "the format [ X ] x [ Y ]. Provide value Y."
-		while ($script:number_4 -lt 1 -or $script:number_4 -gt 50000) {
+		while ($script:number_4 -lt 1 -or $script:number_4 -gt 1000000) {
 			[int]$script:number_4 = Read-Host "Enter a number."
 			[int]$script:number_4_offset = $script:number_4
 			If ($script:number_4 -match "\D") {
 				Write-Host "Invalid input. Please enter a number."
 				$script:number_4 = -1
-			} elseif ($script:number_4 -lt 1 -or $script:number_4 -gt 50000) {
-				Write-Host "Number is out of range. Please enter a number between 1 and 50000."
+			} elseif ($script:number_4 -lt 1 -or $script:number_4 -gt 1000000) {
+				Write-Host "Number is out of range. Please enter a number between 1 and 1,000,000."
 				Write-Host ""
 			} elseif ($script:number_4_offset -le 0) {
 				Write-Host "The number is zero or negative. Please try again."
@@ -367,14 +369,14 @@ If (($Drawpile_Crop_Output_Query -eq "Y") -or ($Drawpile_Crop_Output_Query -eq "
     $number_1 = -1
     Write-Host "Drawpile displays coordinates in the lower left corner with the format (X, Y)"
     Write-Host "For the top left corner of the desired crop area, provide value X."
-    while ($number_1 -lt 1 -or $number_1 -gt 50000) {
+    while ($number_1 -lt 1 -or $number_1 -gt 1000000) {
         $number_1 = Read-Host "Enter a number."
         $number_1 = [int]$number_1
         If ($number_1 -match "\D") {
             Write-Host "Invalid input. Please enter a number."
             $number_1 = -1
-        } elseif ($number_1 -lt 1 -or $number_1 -gt 50000) {
-            Write-Host "Number is out of range. Please enter a number between 1 and 50000."
+        } elseif ($number_1 -lt 1 -or $number_1 -gt 1000000) {
+            Write-Host "Number is out of range. Please enter a number between 1 and 1,000,000."
             Write-Host ""
         } else {
             # Correct value entered.
@@ -386,14 +388,14 @@ If (($Drawpile_Crop_Output_Query -eq "Y") -or ($Drawpile_Crop_Output_Query -eq "
     $number_2 = -1
     Write-Host "Drawpile displays coordinates in the lower left corner with the format (X, Y)"
     Write-Host "For the top left corner of the desired crop area, provide value Y."
-    while ($number_2 -lt 1 -or $number_2 -gt 50000) {
+    while ($number_2 -lt 1 -or $number_2 -gt 1000000) {
         $number_2 = Read-Host "Enter a number."
         $number_2 = [int]$number_2
         If ($number_2 -match "\D") {
             Write-Host "Invalid input. Please enter a number."
             $number_2 = -1
-        } elseif ($number_2 -lt 1 -or $number_2 -gt 50000) {
-            Write-Host "Number is out of range. Please enter a number between 1 and 50000."
+        } elseif ($number_2 -lt 1 -or $number_2 -gt 1000000) {
+            Write-Host "Number is out of range. Please enter a number between 1 and 1,000,000."
             Write-Host ""
         } else {
             # Correct value entered.
@@ -405,7 +407,7 @@ If (($Drawpile_Crop_Output_Query -eq "Y") -or ($Drawpile_Crop_Output_Query -eq "
     $number_3 = -1
     Write-Host "Drawpile displays coordinates in the lower left corner with the format (X, Y)"
     Write-Host "For the bottom right corner of the desired crop area, provide value X."
-    while ($number_3 -lt 1 -or $number_3 -gt 50000) {
+    while ($number_3 -lt 1 -or $number_3 -gt 1000000) {
         $number_3 = Read-Host "Enter a number."
         $number_3 = [int]$number_3
         $number_3_offset=$number_3 - $number_1
@@ -413,8 +415,8 @@ If (($Drawpile_Crop_Output_Query -eq "Y") -or ($Drawpile_Crop_Output_Query -eq "
         If ($number_3 -match "\D") {
             Write-Host "Invalid input. Please enter a number."
             $number_3 = -1
-        } elseif ($number_3 -lt 1 -or $number_3 -gt 50000) {
-            Write-Host "Number is out of range. Please enter a number between 1 and 50000."
+        } elseif ($number_3 -lt 1 -or $number_3 -gt 1000000) {
+            Write-Host "Number is out of range. Please enter a number between 1 and 1,000,000."
             Write-Host ""
         } elseif ($number_3_offset -le 0) {
             Write-Host "The number is zero or negative. Please try again."
@@ -429,7 +431,7 @@ If (($Drawpile_Crop_Output_Query -eq "Y") -or ($Drawpile_Crop_Output_Query -eq "
     $number_4 = -1
     Write-Host "Drawpile displays coordinates in the lower left corner with the format (X, Y)"
     Write-Host "For the bottom right corner of the desired crop area, provide value Y."
-    while ($number_4 -lt 1 -or $number_4 -gt 50000) {
+    while ($number_4 -lt 1 -or $number_4 -gt 1000000) {
         $number_4 = Read-Host "Enter a number."
         $number_4 = [int]$number_4
         $number_4_offset=$number_4 - $number_2
@@ -437,8 +439,8 @@ If (($Drawpile_Crop_Output_Query -eq "Y") -or ($Drawpile_Crop_Output_Query -eq "
         If ($number_4 -match "\D") {
             Write-Host "Invalid input. Please enter a number."
             $number_4 = -1
-        } elseif ($number_4 -lt 1 -or $number_4 -gt 50000) {
-            Write-Host "Number is out of range. Please enter a number between 1 and 50000."
+        } elseif ($number_4 -lt 1 -or $number_4 -gt 1000000) {
+            Write-Host "Number is out of range. Please enter a number between 1 and 1,000,000."
             Write-Host ""
         } elseif ($number_4_offset -le 0) {
             Write-Host "The number is zero or negative. Please try again."
@@ -474,7 +476,7 @@ Write-Host "--------------------------------------------------------------------
 Write-Host "-------------------------------------------------------------------------"
 Write-Host ""
 
-[int]$Suggested_Video_Maximum_Size=1920
+# [int]$Suggested_Video_Maximum_Size=1920
 If (($Drawpile_Crop_Output_Query -ieq "Y") -or ($Drawpile_Crop_Output_Query -ieq "yes") -or ($Drawpile_No_Crop_Size_Query -ieq "Y") -or ($Drawpile_No_Crop_Size_Query -ieq "yes")) {
     # --------------------------------------------------------------------------------------------------------
     function Odd_or_Even_3_Suggestion_Function {
@@ -595,21 +597,25 @@ If (($Drawpile_Crop_Output_Query -ieq "Y") -or ($Drawpile_Crop_Output_Query -ieq
 Write-Host ""
 Write-Host "Set the video dimension output results. This is required."
 Write-Host ""
-Write-Host "Output video should not be greater than 1920 in either"
-Write-Host "direction, so some image compression may be necessary in "
-Write-Host "order to play on more devices."
+Write-Host "General Guidelines  - playback issues above set resolution for a class of devices"
+Write-Host " * mobile devices   - no larger than 1920x1080"
+Write-Host " * computers        - no larger than 7680x4320"
+Write-Host ""
+Write-Host "Because of these guidelines, output video should not be greater than 1920 in either"
+Write-Host "direction, so some image compression may be necessary in order to play on more"
+Write-Host "devices. The script's upper limit is 8,000 by 8,000 resolution."
 Write-Host ""
 
 $number_1 = -1
 Write-Host "Set a value for the video width."
-while ($number_1 -lt 1 -or $number_1 -gt 10000) {
+while ($number_1 -lt 1 -or $number_1 -gt 8000) {
     $number_1 = Read-Host "Enter a number."
     $number_1 = [int]$number_1
     If ($number_1 -match "\D") {
         Write-Host "Invalid input. Please enter a number."
         $number_1 = -1
-    } elseif ($number_1 -lt 1 -or $number_1 -gt 10000) {
-        Write-Host "Number is out of range. Please enter a number between 1 and 10000."
+    } elseif ($number_1 -lt 1 -or $number_1 -gt 8000) {
+        Write-Host "Number is out of range. Please enter a number between 1 and 8,000."
         Write-Host ""
     } else {
         # Correct value entered.
@@ -620,14 +626,14 @@ Write-Host "--------------------------------------------------------------------
 Write-Host ""
 $number_2 = -1
 Write-Host "Set a value for the video height."
-while ($number_2 -lt 1 -or $number_2 -gt 10000) {
+while ($number_2 -lt 1 -or $number_2 -gt 8000) {
     $number_2 = Read-Host "Enter a number."
     $number_2 = [int]$number_2
     If ($number_2 -match "\D") {
         Write-Host "Invalid input. Please enter a number."
         $number_2 = -1
-    } elseif ($number_2 -lt 1 -or $number_2 -gt 10000) {
-        Write-Host "Number is out of range. Please enter a number between 1 and 10000."
+    } elseif ($number_2 -lt 1 -or $number_2 -gt 8000) {
+        Write-Host "Number is out of range. Please enter a number between 1 and 8,000."
         Write-Host ""
     } else {
         # Correct value entered.
@@ -740,15 +746,15 @@ Write-Host "--------------------------------------------------------------------
 Write-Host "-------------------------------------------------------------------------"
 Write-Host ""
 #    -i, --interval <interval>
-Write-Host "Interval between each frame, in milliseconds. Defaults to 10000,"
+Write-Host "Interval between each frame, in milliseconds. Defaults to 10,000,"
 Write-Host "higher values mean the timelapse will be faster."
 Write-Host ""
 $number = -1
 while ($number -lt 1 -or $number -gt 100000) {
-    $number = Read-Host "Enter a number between 1 and 100000, default value is 10000 if left blank."
+    $number = Read-Host "Enter a number between 1 and 100,000, default value is 10,000 if left blank."
     if ([string]::IsNullOrEmpty($number)) {
         Write-Host ""
-        Write-Host "Left blank, using default value of 10000."
+        Write-Host "Left blank, using default value of 100,000."
         $number = 10000
         $number = [int]$number
     } Else {
@@ -757,7 +763,7 @@ while ($number -lt 1 -or $number -gt 100000) {
             Write-Host "Invalid input. Please enter a number."
             $number = -1
         } elseif ($number -lt 1 -or $number -gt 100000) {
-            Write-Host "Number is out of range. Please enter a number between 1 and 100000."
+            Write-Host "Number is out of range. Please enter a number between 1 and 100,000."
             Write-Host ""
         }
     }
@@ -966,9 +972,9 @@ If (($Drawpile_Logo_In_Video -eq "y") -or ($Drawpile_Logo_In_Video -eq "yes")) {
        #   Default is 20x20.
 
        $number = -1
-       Write-Host "Set the distance of the logo from corner. Assumed square size (both sides are equal."
-        while ($number -lt 1 -or $number -gt 512) {
-            $number = Read-Host "Enter a number between 1 and 512, default value is 20 if left blank."
+       Write-Host "Set the distance of the logo from corner. Assumed square size (both sides are equal)."
+        while ($number -lt 1 -or $number -gt 4000) {
+            $number = Read-Host "Enter a number between 1 and 4,000, default value is 20 if left blank."
             if ([string]::IsNullOrEmpty($number)) {
                 Write-Host ""
                 Write-Host "Left blank, using default value of 20."
@@ -980,8 +986,8 @@ If (($Drawpile_Logo_In_Video -eq "y") -or ($Drawpile_Logo_In_Video -eq "yes")) {
                     Write-Host "Invalid input. Please enter a number."
                     $number = -1
                 }
-                elseif ($number -lt 1 -or $number -gt 512) {
-                    Write-Host "Number is out of range. Please enter a number between 1 and 512."
+                elseif ($number -lt 1 -or $number -gt 4000) {
+                    Write-Host "Number is out of range. Please enter a number between 1 and 4,000."
                     Write-Host ""
                 }
             }
